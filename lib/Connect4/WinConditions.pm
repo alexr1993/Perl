@@ -1,21 +1,19 @@
-package RandomPrograms::Connect4WinConditions;
+package Connect4::WinConditions;
 use strict;
 use warnings;
+
 use Readonly;
-use Data::Dumper qw(Dumper);
+use List::MoreUtils qw{ any };
+use Carp;
 
-my @PLAYER_TOKENS    = undef;
-
-sub setPlayerTokens {
-    @PLAYER_TOKENS = @_;
-    print "Players in this game are: " . join(", ", @PLAYER_TOKENS) . "\n";
-}
+my @PLAYER_TOKENS = undef;
 
 # checks list of strings for 4 player tokens in a row
 sub _containsFourInARow {
     my ($string) = @_;
     
     foreach my $token (@PLAYER_TOKENS) {
+        # Check if there are four in a row
         if (index($string, $token x 4) > -1) {
             print "4 in a row!\n";
             return 1;
@@ -103,19 +101,36 @@ sub _convertToDiamondMatrix {
 }
 
 sub _hasDiagonalWin {
-    #print "Checking diagonal... \n";
     my ($board) = @_;
+    
+    # Picture looking at a connect 4 board turned 45 degrees right
     my $right_tilt_diagonals_ref = _convertToDiamondMatrix(
-        $board, 'right');
+        $board, 'right'
+    );
+
+    # and then 45 degrees left
     my $left_tilt_diagonals_ref  = _convertToDiamondMatrix(
-        _rotateMatrix($board), 'left');
+        _rotateMatrix($board), 'left'
+    );
     
     return _hasHorizontalWin($right_tilt_diagonals_ref)
         || _hasHorizontalWin($left_tilt_diagonals_ref);
 
 }
 
+sub setPlayerTokens {
+    my @input = shift;
+
+    croak 'Player tokens must be a single character'
+        if any { length($_) != 1 } @input;
+    
+    @PLAYER_TOKENS = @input;
+    print "Players in this game are: " . join(", ", @PLAYER_TOKENS) . "\n";
+}
+
 sub hasEnded {
+    croak 'Player tokens have not been set' if !@PLAYER_TOKENS;
+
     my ($board) = @_;
     return  _hasHorizontalWin($board) 
          || _hasVerticalWin($board)

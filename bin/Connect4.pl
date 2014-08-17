@@ -1,8 +1,10 @@
+#!/usr/bin/perl -w
+
 use strict;
 use warnings;
 use Readonly; 
 
-require RandomPrograms::Connect4WinConditions;
+require Connect4::WinConditions;
 
 # globals
 Readonly my $BOARD_WIDTH  => 8;
@@ -101,14 +103,14 @@ sub mainLoop {
 
         insertCounterToCell($column_ix, $row_ix, $counter);
         $finished
-            = RandomPrograms::Connect4WinConditions::hasEnded($BOARD);
+            = Connect4::WinConditions::hasEnded($BOARD);
         printBoard(); 
         ++$turn;
     }
 }
 
 sub init {
-    RandomPrograms::Connect4WinConditions::setPlayerTokens(
+    Connect4::WinConditions::setPlayerTokens(
         values %$PLAYERS);
     mainLoop();
 }
